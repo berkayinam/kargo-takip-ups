@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr" class="bg-gray-50 dark:bg-gray-900">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kargo Takip Sistemi</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#7800d3',
+            'primary-dark': '#5a009e',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 flex flex-col">
+  <div class="fixed top-4 right-56 z-50">
+    <button id="deleteAllKargos" type="button" class="px-4 py-2 rounded bg-red-600 text-white font-semibold shadow hover:bg-red-700 transition-colors">Tümünü Sil</button>
+  </div>
+  <br> <br>
+  <div class="fixed top-4 right-4 z-50">
+    <button id="toggleDark" type="button" class="px-4 py-2 rounded bg-primary text-white font-semibold shadow hover:bg-primary-dark transition-colors">
+      Dark 🌙 / Light ☀️
+    </button>
+  </div>
+  <div class="flex-1 flex flex-col justify-center items-center py-8">
+    <div class="w-full max-w-6xl mx-auto flex flex-col items-center">
+      <h1 class="text-3xl font-bold tracking-tight mb-8 text-[#7800d3] dark:text-white">Kargo Takip Sistemi</h1>
+      <div class="w-full flex flex-row flex-wrap gap-3 items-center justify-center mb-8">
+        <form id="kargoForm" class="flex flex-row flex-wrap gap-3 items-center justify-center m-0 p-0">
+          <label class="flex flex-col text-sm font-medium">
+            Takip No:
+            <input type="text" id="takipNo" required class="mt-1 rounded border-gray-300 focus:border-primary focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
+          </label>
+          <label class="flex flex-col text-sm font-medium">
+            Mağaza ID:
+            <input type="text" id="magazaID" class="mt-1 rounded border-gray-300 focus:border-primary focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
+          </label>
+          <label class="flex flex-col text-sm font-medium">
+            Talep ID:
+            <input type="text" id="talepID" class="mt-1 rounded border-gray-300 focus:border-primary focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
+          </label>
+          <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded font-semibold shadow transition-colors h-[42px] mt-6">Ekle</button>
+          <button id="loadFrom4me" type="button" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded font-semibold shadow transition-colors h-[42px] mt-6">4me'den Yükle</button>
+          <button id="updateKargos" type="button" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded font-semibold shadow transition-colors h-[42px] mt-6">Kargoları Güncelle</button>
+        </form>
+      </div>
+    </div>
+
+    <table id="kargoTable" class="w-full max-w-6xl mx-auto border border-gray-300 dark:border-gray-600 border-collapse mt-4 rounded-lg overflow-hidden shadow-sm bg-gray-200 dark:bg-[#1a1026] px-2 md:px-8">
+      <thead>
+        <tr>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Takip No</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Mağaza ID</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Talep ID</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Talep Adı</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Durum</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Öngörülen Teslimat</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">Son Güncelleme</th>
+          <th class="bg-primary text-white font-semibold py-3 px-2 text-left border-r border-gray-300 dark:border-gray-600 last:border-r-0">İşlem</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+    </table>
+    <div id="talepSayisi" class="mt-3 font-bold text-primary dark:text-white">Toplam Talep: 0</div>
+    <div class="loading-overlay fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50 hidden" id="loadingOverlay">
+      <div class="text-center">
+        <div class="loading-spinner w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin mx-auto"></div>
+        <div class="loading-text text-white mt-4 text-lg">Veriler yükleniyor, lütfen bekleyiniz...</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Dark mode toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('toggleDark');
+      btn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
