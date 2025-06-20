@@ -28,8 +28,8 @@ Bu proje, kargo takip işlemlerini yönetmek için geliştirilmiş bir web uygul
 
 1. Projeyi klonlayın:
 ```bash
-git clone https://github.com/berkayinam/KargoTakipWebbApp.git
-cd kargo-takip-projesi
+git clone https://github.com/berkayinam/kargo-takip-ups.git
+cd kargo-takip-ups
 ```
 
 2. Docker ile çalıştırın:
@@ -78,14 +78,3 @@ dotnet run
 cd frontend
 # Statik dosyaları bir web sunucusu ile servis edin
 ```
-
-## Sürüm Bilgileri
-
-| Versiyon | Açıklama                     | Değişiklikler Özeti                               |
-| -------- | --------------------------- | ------------------------------------------------ |
-| 0.1.0   | Kapsamlı README.md eklendi. | Kapsamlı README.md dosyası eklendi.              |
-
-
-## Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
